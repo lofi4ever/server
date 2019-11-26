@@ -15,3 +15,8 @@ html, body {
     padding: 0 15px;
     margin: 0 auto;
 }
+
+.users-form input[type="submit"] {
+    display: block;
+    margin-top: 18px;
+}

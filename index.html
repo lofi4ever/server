@@ -11,11 +11,23 @@
     <div class="wrapper">
         <h1>Main page</h1>
 
-        <form action="/users" name="users-form">
-            <h2>Request user info</h2>
-            <label for="name">Name</label>
-            <input type="text" name="name" id="name">
-            <input type="submit" value="send">
+        <form action="/users" name="users-form" id="users-form" class="users-form">
+            <label>
+                name
+                <input type="text" name="name">
+            </label>
+            <label>
+                age
+                <input type="text" name="age">
+            </label>
+            <label>
+                id
+                <input type="text" name="id">
+            </label>
+            <input type="submit" data-type="request" value="request">
+            <input type="submit" data-type="send" value="send">
+            <input type="submit" data-type="delete" value="delete">
+            <input type="submit" data-type="put" value="put">
         </form>
     </div>
 

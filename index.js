@@ -1,127 +1,65 @@
-const express = require('express');
 const http = require('http');
-const MongoClient = require('mongodb').MongoClient;
+const express = require('express');
 const bodyParser = require('body-parser');
+const MongoClient = require('mongodb').MongoClient;
+const objectId = require('mongodb').ObjectID;
 
 const jsonParser = bodyParser.json();
+const handler = express();
+let dbClient;
 
-new MongoClient('mongodb://localhost:27017', {useNewUrlParser: true})
+handler.use(express.static(`${__dirname}/public`));
+
+new MongoClient('mongodb://localhost:27017/', {useNewUrlParser: true})
   .connect((err, client) => {
     if(err) return console.log(err);
-    const db = client.db('test');
-    const collection = db.collection('users');
-    collection.find({name: "Tom"})
-      .each((err, doc) => {
-        if(err) return console.log(err);
-        //if(doc === null) client.close();
-        console.log(doc);
-      });
-
-    const handler = express()
-      .use(express.static(`${__dirname}/public`))
-      .get('/', (_, res) => {
-        res.sendFile(`${__dirname}/index.html`);
-      })
-      .get('/users', jsonParser, (req, res) => {
-          let {body} = req;
-          console.log(body);
-          res.send('response from server');
-      });
-
-    http.createServer(handler)
-      .listen('3000', () => console.log('Run'));
-
-      client.on('close', () => console.log('Client was closed'));
+    dbClient = client;
+    handler.locals.collection = dbClient.db('test').collection('users');
+    http.createServer(handler).listen(3000, () => console.log('run'));
   });
 
-/* BD */
-// const mongoClient = new MongoClient('mongodb://localhost:27017', {useNewUrlParser: true});
+handler
+  .get('/', (req, res) => {
+    res.sendFile(`${__dirname}/index.html`);
+  })
+  .get('/users', (req, res) => {
+    req.app.locals.collection.find().toArray((err, result) => {
+      if(err) return console.log(err);
+      res.send(result);
+    });
+  })
+  .get('/users/:id', (req, res) => {
+    let collection = req.app.locals.collection;
+    let id = new objectId(req.params.id);
+    collection.findOne({_id: id}, (err, result) => {
+      if(err) return console.log(err);
+      res.send(result);
+    });
+  })
+  .post('/users', jsonParser, (req, res) => {
+    let {name, age} = req.body;
+    req.app.locals.collection.insertOne({name: name, age: age}, (err, result) => {
+      if(err) return console.log(err);
+      res.send('' + result.result.ok);
+    });
+  })
+  .delete('/users/:id', (req, res) => {
+    req.app.locals.collection.findOneAndDelete({_id: new objectId(req.params.id)}, (err, result) => {
+      if(err) return console.log(err);
+      res.send(result);
+    });
+  })
+  .put('/users', jsonParser, (req, res) => {
+    let {id, name, age} = req.body;
+    //console.log(`name: ${name}; age: ${age}`);
+    console.log(req.body);
+    req.app.locals.collection.findOneAndUpdate({_id: new objectId(id)}, {$set: {name: name, age: age}}, (err, result) => {
+      if(err) return console.log(err);
+      res.send(result);
+    });
+  });
 
-// mongoClient.connect((err, client) => {
-//   if(err) return console.log(err);
-//   const db = client.db('usersdb');
-//   const collection = db.collection('users');
-//   let user = {name: "Jules", age: 19};
-//   // collection.insertOne(user, (err, result) => {
-//   //   if(err) return console.log(err);
-//   //   console.log(result.ops);
-//   //   client.close()
-//   // });
-
-//   // collection.insertMany([{name: 'Alice', age: 21}, {name: 'Charli', age: 27}, {name: 'Tommy', age: 21}], (err, results) => {
-//   //   //console.log(results);
-//   //   if(err) return console.log(err);
-//   //   for (let i = 0; i < results.insertedCount; i++) {
-//   //     console.log(results.ops[i]['name']);
-//   //   }
-//   //   client.close();
-//   // });
-
-//   // collection.find().toArray((err, results) => {
-//   //   if(err) return console.log(err);
-//   //   console.log(results);
-//   //   client.close();
-//   // });
-
-//   let cursor = collection.find();
-//   cursor.each((err, doc) => {
-//     if(err) console.log(err);
-//     if(doc == null) {
-//       return client.close();
-//     }
-//     console.log(doc);
-//   });
-
-//   client.close();
-
-//   //console.log(collection.find());
-// });
-// /* !BD */
-
-//const mongoClient = new MongoClient('mongodb://localhost:27017', {useNewUrlParser: true});;
-
-// mongoClient.connect((err, client) => {
-//   if(err) return console.log(err);
-//   const db = client.db('test');
-//   const collection = db.collection('users');
-
-//   let cursor = collection.find();
-//   cursor.each((err, doc) => {
-//     if(err) return console.log(err);
-//     if(doc === null) {
-//       client.close();
-//     }
-//     console.log(doc);
-//   });
-// });
-
-// mongoClient.connect((err, client) => {
-//   if(err) return console.log(err);
-//   const db = client.db('test');
-//   const collection = db.collection('users');
-//   collection.find({name: "Tom"})
-//     .each((err, doc) => {
-//         if(err) return console.log(err);
-//         if(doc === null) client.close();
-//         console.log(doc)
-//     });
-
-//   // collection.findOneAndDelete({name: "Tom"}, (err, result) => {
-//   //   if(err) return console.log(err);
-//   //   console.log(result);
-//   // });
-
-//   client.on('close', () => console.log('CLIENT CLOSED'));
-// });
-
-// const handler = express();
-
-// handler
-//     .use(express.static(`${__dirname}/public`))
-//     .get('/', (req, res) => {
-//         console.log('page was requested');
-//         res.sendFile(`${__dirname}/index.html`);
-//     });
-
-// http.createServer(handler)
-//     .listen(3000, () => console.log('run'));
+process.on('SIGIOT', () => {
+  dbClient.close();
+  process.exit();
+});
