@@ -1,65 +1,68 @@
-const http = require('http');
 const express = require('express');
+const http = require('http');
 const bodyParser = require('body-parser');
-const MongoClient = require('mongodb').MongoClient;
-const objectId = require('mongodb').ObjectID;
+const mongoose = require('mongoose');
 
 const jsonParser = bodyParser.json();
+const Schema = mongoose.Schema;
+
 const handler = express();
-let dbClient;
 
-handler.use(express.static(`${__dirname}/public`));
-
-new MongoClient('mongodb://localhost:27017/', {useNewUrlParser: true})
-  .connect((err, client) => {
-    if(err) return console.log(err);
-    dbClient = client;
-    handler.locals.collection = dbClient.db('test').collection('users');
-    http.createServer(handler).listen(3000, () => console.log('run'));
-  });
+mongoose.connect('mongodb://localhost:27017', {useNewUrlParser: true}, (err) => {
+  if(err) return console.log(err);
+  http.createServer(handler)
+    .listen(3000, () => console.log('run'));
+});
+const userSchema = new Schema({
+  name: String,
+  age: Number
+});
+const User = mongoose.model('User', userSchema);
 
 handler
+  .use(express.static(`${__dirname}/public`))
   .get('/', (req, res) => {
     res.sendFile(`${__dirname}/index.html`);
   })
   .get('/users', (req, res) => {
-    req.app.locals.collection.find().toArray((err, result) => {
+    User.find({}, (err, results) => {
       if(err) return console.log(err);
-      res.send(result);
+      res.json(results);
     });
   })
   .get('/users/:id', (req, res) => {
-    let collection = req.app.locals.collection;
-    let id = new objectId(req.params.id);
-    collection.findOne({_id: id}, (err, result) => {
-      if(err) return console.log(err);
-      res.send(result);
-    });
+    if(!req.params) res.sendStatus(400);
+    User.find({_id: req.params.id})
+      .then((doc) => {
+        res.json(doc);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.sendStatus(404);
+      });
   })
   .post('/users', jsonParser, (req, res) => {
-    let {name, age} = req.body;
-    req.app.locals.collection.insertOne({name: name, age: age}, (err, result) => {
-      if(err) return console.log(err);
-      res.send('' + result.result.ok);
-    });
-  })
-  .delete('/users/:id', (req, res) => {
-    req.app.locals.collection.findOneAndDelete({_id: new objectId(req.params.id)}, (err, result) => {
-      if(err) return console.log(err);
-      res.send(result);
-    });
+    let user = new User(req.body);
+    user.save((err) => {
+      if(err) {
+        res.send(false);
+      } else {
+        res.send(true);
+      }
+    })
   })
   .put('/users', jsonParser, (req, res) => {
     let {id, name, age} = req.body;
-    //console.log(`name: ${name}; age: ${age}`);
-    console.log(req.body);
-    req.app.locals.collection.findOneAndUpdate({_id: new objectId(id)}, {$set: {name: name, age: age}}, (err, result) => {
-      if(err) return console.log(err);
+    User.findOneAndUpdate(
+      {_id: id},
+      {
+        name: name,
+        age: age
+      },
+      {new: true}
+    ).then((result) => {
       res.send(result);
+    }).catch((err) => {
+      res.send(err);
     });
   });
-
-process.on('SIGIOT', () => {
-  dbClient.close();
-  process.exit();
-});

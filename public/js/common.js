@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     xhr.open('POST', '/users');
                     xhr.setRequestHeader('content-type', 'application/json');
                     xhr.addEventListener('load', function() {
-                        if(parseInt(xhr.responseText) > 0) {
+                        if(xhr.responseText === 'true') {
                             alert('user added');
                         } else {
                             alert('failed to add user');
