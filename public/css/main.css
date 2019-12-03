@@ -20,3 +20,15 @@ html, body {
     display: block;
     margin-top: 18px;
 }
+
+.tasks {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.task {
+    background-color: pink;
+    border-radius: 20px;
+    padding: 20px;
+    margin: 10px;
+}

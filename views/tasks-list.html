@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+  <div class="tasks">
+    {% for task in tasks %}
+      <div class="task">
+        <div class="task__name">{{task.name}}</div>
+        <div class="task__description">{{task.description}}</div>
+        {% if(task.completed) %}
+          Completed!
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</body>
+</html>
