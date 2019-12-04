@@ -1,0 +1,26 @@
+{%
+  set headerNav = [
+    {
+      title: "Main",
+      href: "/"
+    },
+    {
+      title: "Tasks",
+      href: "/tasks"
+    }
+  ]
+%}
+
+<header class="header">
+  <div class="wrapper">
+    <nav class="header-nav">
+      <ul class="header-nav__list">
+        {% for item in headerNav %}
+          <li>
+            <a href="{{ item.href }}">{{ item.title }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+  </div>
+</header>
