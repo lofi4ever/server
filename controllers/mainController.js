@@ -1,5 +1,7 @@
 module.exports.home = (req, res) => {
-  res.render('index.html');
+  res.render('index.html', {
+    pageTitle: 'Main'
+  });
 };
 
 module.exports.about = (req, res) => {

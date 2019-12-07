@@ -6,6 +6,7 @@ const gcmq = require("gulp-group-css-media-queries");
 const sourcemaps = require("gulp-sourcemaps");
 const notify = require("gulp-notify");
 const concat = require("gulp-concat");
+const nodemon = require("gulp-nodemon");
 
 const { jsLibsOrder } = require("./configurations.js");
 
@@ -14,14 +15,32 @@ const paths = {
   js: "./public/js/*.js"
 };
 
-function style() {
-  return src(paths.sass)
+function nodemonStream(done) {
+  let stream = nodemon({
+    script: 'index.js',
+    ext: 'js html',
+    done: done
+  });
+  stream
+    .on('crash', () => {
+      stream.emit('restart', 5);
+    })
+}
+
+function style(cb) {
+  src(paths.sass)
     .pipe(sourcemaps.init())
     .pipe(sass().on("error", notify.onError()))
     .pipe(autoprefixer())
     .pipe(gcmq())
     .pipe(sourcemaps.write("./"))
     .pipe(dest("./public/css"));
+  cb();
+}
+
+function watchStyles(cb) {
+  watch(paths.sass, style);
+  cb();
 }
 
 function concatJs() {
@@ -41,4 +60,7 @@ function concatCss() {
     .pipe(dest("./dev/css/"));
 }
 
-exports.default = watchFiles;
+exports.default = function() {
+  nodemonStream();
+  watch(paths.sass, style);
+}
