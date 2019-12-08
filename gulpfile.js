@@ -38,11 +38,6 @@ function style(cb) {
   cb();
 }
 
-function watchStyles(cb) {
-  watch(paths.sass, style);
-  cb();
-}
-
 function concatJs() {
   let order = jsLibsOrder;
   if (!order || !order.length) {
@@ -55,12 +50,14 @@ function concatJs() {
 }
 
 function concatCss() {
-  return src("./dev/libs/**/*.css")
+  return src("./libs/**/*.css")
     .pipe(concat("libs.css"))
-    .pipe(dest("./dev/css/"));
+    .pipe(dest("./public/css/"));
 }
 
 exports.default = function() {
   nodemonStream();
+  concatJs();
+  concatCss();
   watch(paths.sass, style);
 }

@@ -1,0 +1,18 @@
+{% macro task(name, description, complete) %}
+<div class="task">
+  <div class="task__block">
+    <input type="text" class="task__title" value="{{ name }}">    
+  </div>
+  <div class="task__block">
+    <textarea>
+      {{ description }}
+    </textarea>
+  </div>
+  <div class="task__block">
+    <label>
+      <input type="checkbox" {% if complete %} checked {% endif %}>
+      Complete
+    </label>
+  </div>
+</div>
+{% endmacro %}

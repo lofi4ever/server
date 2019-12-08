@@ -6,7 +6,6 @@ const route = new express.Router();
 
 route
   .get('/', controllers.list)
-  .get('/add', controllers.form)
-  .post('/add', jsonParser, controllers.add);
+  .post('/', jsonParser, controllers.create);
 
 module.exports = route;

@@ -1,0 +1,42 @@
+.tasks {
+  display: -webkit-box;
+  display: flex;
+  flex-wrap: wrap;
+  margin: -15px;
+}
+
+.tasks .task {
+  width: 300px;
+  margin: 15px;
+}
+
+.task {
+  background-color: #fff;
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.task input[type="text"],
+.task textarea {
+  display: block;
+  width: 100%;
+  border: 1px solid;
+  border-color: rgba(0, 0, 0, 0.15);
+  outline: none !important;
+  border-radius: 3px;
+  padding: 10px;
+}
+
+.task input[type="text"]:focus,
+.task textarea:focus {
+  border-color: #000;
+}
+
+.task textarea {
+  height: 250px;
+}
+
+.task__block:not(:first-child) {
+  margin-top: 15px;
+}
+/*# sourceMappingURL=task.css.map */

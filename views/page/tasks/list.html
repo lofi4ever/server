@@ -1,0 +1,24 @@
+{% extends "layout/main.html" %}
+{% import "page/tasks/chunk.html" as chunk %}
+
+{% block content %}
+
+<div class="wrapper">
+  <h1 class="page-title">Tasks</h1>
+
+  <div class="tasks">
+    {% for task in tasks %}
+      {{
+        chunk.task(
+          name=task.name,
+          description=task.description,
+          complete=task.complete
+        )
+      }}
+    {% else %}
+      Tasks not found
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

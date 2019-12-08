@@ -1,0 +1,23 @@
+.header-nav {
+  &__list {
+    padding: 16px 0;
+    margin: 0;
+    list-style-type: none;
+    display: flex;
+    justify-content: flex-end;
+    font-size: 18px;
+    li {
+      &:not(:first-child) {
+        margin-left: 18px;
+      }
+    }
+    a {
+      text-decoration: none;
+      color: #000;
+      &:hover, &:focus, &:active {
+        text-decoration: none;
+        color: #000;
+      }
+    }
+  }
+}
